@@ -11,18 +11,17 @@ var (
 	ErrRequestsFailed = errors.New("request not ok")
 
 	ErrInvalidSeed = errors.New("seed is invalid")
-
-	sess *grequests.Session
 )
 
 func init() {
-	sess = grequests.NewSession(nil)
+
 }
 
 // download seed and parse it to urls
 func downloadSeed(url string, ro *grequests.RequestOptions) []string{
-	res, err := sess.Get(url, ro)
-	if err != nil || res == nil || !res.Ok {
+	res, err := grequests.Get(url, ro)
+	ErrPanic(err)
+	if res == nil || !res.Ok {
 		ErrPanic(ErrRequestsFailed)
 	}
 	content := res.String()
@@ -33,19 +32,20 @@ func downloadSeed(url string, ro *grequests.RequestOptions) []string{
 			urls = append(urls, lines[i])
 		}
 	}
-	if len(urls) == 0 || strings.HasPrefix(urls[0], "http"){
+	if len(urls) == 0 {
 		return urls
 	}
 	var completeUrls []string
 	var baseUrl string
 
-	if strings.HasPrefix(urls[0], "/") {
-		baseUrl = getHostname(url)
-	} else {
-		baseUrl = getPrefix(url)
-	}
-
 	for i := range urls {
+		if strings.HasPrefix(urls[i], "http") {
+			baseUrl = ""
+		} else if strings.HasPrefix(urls[i], "/") {
+			baseUrl = getHostname(url)
+		} else {
+			baseUrl = getPrefix(url)
+		}
 		completeUrls = append(completeUrls, joinUrl(baseUrl, urls[i]))
 	}
 
@@ -134,14 +134,15 @@ func getTsUrls(url string, ro *grequests.RequestOptions) []string {
 			ErrPanic(ErrInvalidSeed)
 		}
 		var base string
-		if strings.HasPrefix(newUrls[0], "http") {
-			base = ""
-		} else if strings.HasPrefix(newUrls[0], "/") {
-			base = getHostname(originUrls[0])
-		} else {
-			base = getPrefix(originUrls[0])
-		}
+
 		for i := range newUrls {
+			if strings.HasPrefix(newUrls[i], "http") {
+				base = ""
+			} else if strings.HasPrefix(newUrls[i], "/") {
+				base = getHostname(originUrls[0])
+			} else {
+				base = getPrefix(originUrls[0])
+			}
 			newUrls[i] = joinUrl(base, newUrls[i])
 		}
 		originUrls = newUrls
