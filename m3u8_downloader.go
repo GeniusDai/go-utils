@@ -2,9 +2,10 @@ package utils
 
 import (
 	"bytes"
-	"github.com/levigross/grequests"
 	"errors"
 	"strings"
+
+	"github.com/levigross/grequests"
 )
 
 var (
@@ -18,7 +19,7 @@ func init() {
 }
 
 // download seed and parse it to urls
-func downloadSeed(url string, ro *grequests.RequestOptions) []string{
+func downloadSeed(url string, ro *grequests.RequestOptions) []string {
 	res, err := grequests.Get(url, ro)
 	ErrPanic(err)
 	if res == nil || !res.Ok {
@@ -57,7 +58,7 @@ func getHostname(url string) string {
 	var index, count int
 	for i := range url {
 		if url[i] == '/' {
-			count ++
+			count++
 		}
 		if count == 3 {
 			index = i
@@ -82,9 +83,8 @@ func getPrefix(url string) string {
 	}
 	if index == 0 {
 		return ""
-	} else {
-		return url[:index + 1]
 	}
+	return url[:index+1]
 }
 
 func joinUrl(url1, url2 string) string {
@@ -95,12 +95,12 @@ func joinUrl(url1, url2 string) string {
 		return url1
 	}
 	var buffer bytes.Buffer
-	var b1 = url1[len(url1) - 1] == '/'
+	var b1 = url1[len(url1)-1] == '/'
 	var b2 = url2[0] == '/'
 	if (b1 && !b2) || (!b1 && b2) {
 		buffer.WriteString(url1)
 		buffer.WriteString(url2)
-	} else if (b1 && b2) {
+	} else if b1 && b2 {
 		buffer.WriteString(url1)
 		buffer.WriteString(url2[1:])
 	} else {
