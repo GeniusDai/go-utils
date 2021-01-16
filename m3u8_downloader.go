@@ -121,7 +121,7 @@ func getTsUrls(url string, ro *grequests.RequestOptions) []string {
 			ErrPanic(ErrInvalidSeed)
 		}
 		// not seed, just return
-		if !strings.HasSuffix(originUrls[0], "m3u8") {
+		if !strings.Contains(originUrls[0], "m3u8") {
 			return originUrls
 		}
 		for i := range originUrls {
